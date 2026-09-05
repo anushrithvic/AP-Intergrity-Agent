@@ -1,0 +1,80 @@
+transaction_id,date,vendor_name,transaction_type,fee_type,amount,invoice_number,account_id
+TXN-0001,2026-01-08,Nova Cloud Services,payment,,5971.17,INV-39256,ACC-001
+TXN-0002,2026-01-18,Riverstone Consulting,payment,,5462.09,INV-21395,ACC-003
+TXN-0003,2026-02-28,Ironwood Equipment Rental,payment,,399.49,INV-38657,ACC-001
+TXN-0004,2026-03-10,Vantage IT Solutions,payment,,4875.85,INV-36062,ACC-003
+TXN-0005,2026-02-27,Coastal Insurance Brokers,payment,,1880.46,INV-46463,ACC-003
+TXN-0006,2026-01-25,Acme Corp,payment,,5630.39,INV-46421,ACC-002
+TXN-0007,2026-02-01,Riverstone Consulting,payment,,7664.12,INV-23396,ACC-002
+TXN-0008,2026-02-22,Sterling Office Supplies,payment,,909.22,INV-89131,ACC-002
+TXN-0009,2026-01-10,Horizon Marketing Group,payment,,5878.39,INV-26361,ACC-003
+TXN-0010,2026-01-15,Summit Energy Partners,payment,,4483.52,INV-91070,ACC-003
+TXN-0011,2026-03-19,Falcon Freight Co,payment,,1659.47,INV-16006,ACC-001
+TXN-0012,2026-02-11,Vantage IT Solutions,payment,,7883.99,INV-23238,ACC-001
+TXN-0013,2026-02-09,Summit Energy Partners,payment,,3709.27,INV-31319,ACC-002
+TXN-0014,2026-02-19,Falcon Freight Co,payment,,1794.63,INV-99593,ACC-002
+TXN-0015,2026-01-26,Sterling Office Supplies,payment,,4343.0,INV-31417,ACC-001
+TXN-0016,2026-02-22,Lakeside Analytics,payment,,2269.09,INV-83000,ACC-003
+TXN-0017,2026-02-15,Vantage IT Solutions,payment,,6766.39,INV-40021,ACC-001
+TXN-0018,2026-02-14,Bright Path Logistics,payment,,3299.14,INV-37653,ACC-001
+TXN-0019,2026-02-14,Ironwood Equipment Rental,payment,,1819.12,INV-61856,ACC-002
+TXN-0020,2026-01-23,Lakeside Analytics,payment,,2229.31,INV-83579,ACC-001
+TXN-0021,2026-02-07,Coastal Insurance Brokers,payment,,6014.06,INV-86484,ACC-002
+TXN-0022,2026-02-20,Summit Energy Partners,payment,,1871.67,INV-76784,ACC-001
+TXN-0023,2026-01-16,Windmill Staffing,payment,,6082.89,INV-30033,ACC-001
+TXN-0024,2026-02-28,Pinnacle Manufacturing,payment,,4831.81,INV-60019,ACC-002
+TXN-0025,2026-03-05,Zenith Software Inc,payment,,4303.55,INV-11504,ACC-003
+TXN-0026,2026-03-14,Nova Cloud Services,payment,,6044.39,INV-54587,ACC-003
+TXN-0027,2026-02-11,Nova Cloud Services,payment,,3562.91,INV-10425,ACC-002
+TXN-0028,2026-03-10,Horizon Marketing Group,payment,,6131.4,INV-23947,ACC-003
+TXN-0029,2026-03-10,Blue Ridge Facilities,payment,,4930.42,INV-59009,ACC-001
+TXN-0030,2026-03-15,Pinnacle Manufacturing,payment,,7634.97,INV-10074,ACC-003
+TXN-0031,2026-02-15,Zenith Software Inc,payment,,3985.55,INV-57576,ACC-001
+TXN-0032,2026-02-04,Blue Ridge Facilities,payment,,604.71,INV-20322,ACC-003
+TXN-0033,2026-03-08,Sterling Office Supplies,payment,,6555.78,INV-26483,ACC-003
+TXN-0034,2026-03-06,Riverstone Consulting,payment,,7582.76,INV-44741,ACC-001
+TXN-0035,2026-02-06,Granite Security Services,payment,,7043.25,INV-37760,ACC-003
+TXN-0036,2026-02-09,Granite Security Services,payment,,7043.25,INV-50857,ACC-003
+TXN-0037,2026-02-20,Summit Energy Partners,payment,,7963.62,INV-58944,ACC-002
+TXN-0038,2026-02-27,Summit Energy Partners,payment,,7968.05,INV-58944,ACC-002
+TXN-0039,2026-01-31,Vantage IT Solutions,payment,,2185.23,INV-12757,ACC-003
+TXN-0040,2026-02-09,Vantage IT Solutions,payment,,2185.23,INV-12757,ACC-003
+TXN-0041,2026-01-10,Horizon Marketing Group,payment,,4913.3,INV-19305,ACC-003
+TXN-0042,2026-01-13,Horizon Marketing Group Corp,payment,,4913.3,INV-19305,ACC-003
+TXN-0043,2026-01-12,Blue Ridge Facilities,payment,,1005.5,INV-53309,ACC-001
+TXN-0044,2026-01-16,Blue Ridge Facilities,payment,,1008.73,INV-73624,ACC-001
+TXN-0045,2026-02-25,Nova Cloud Services,payment,,4544.25,INV-84847,ACC-003
+TXN-0046,2026-03-07,Nova Cloud Services Company,payment,,4547.19,INV-63354,ACC-003
+TXN-0047,2026-02-21,Riverstone Consulting,payment,,1207.44,INV-66498,ACC-002
+TXN-0048,2026-02-22,Riverstone Consulting,payment,,1207.44,INV-66498,ACC-002
+TXN-0049,2026-03-05,Crestwood Printing,payment,,3530.14,INV-54473,ACC-002
+TXN-0050,2026-03-07,Crestwood Printing,payment,,775.51,INV-24322,ACC-002
+TXN-0051,2026-01-29,Vantage IT Solutions,payment,,1130.82,INV-68082,ACC-001
+TXN-0052,2026-02-03,Vantage IT Solutions,payment,,3242.03,INV-82132,ACC-001
+TXN-0053,2026-01-17,,fee,wire_fee,18.71,,ACC-001
+TXN-0054,2026-01-16,,fee,wire_fee,30.97,,ACC-001
+TXN-0055,2026-01-26,,fee,wire_fee,23.69,,ACC-003
+TXN-0056,2026-02-01,,fee,monthly_maintenance,16.92,,ACC-001
+TXN-0057,2026-01-26,,fee,monthly_maintenance,13.03,,ACC-003
+TXN-0058,2026-02-07,,fee,monthly_maintenance,17.41,,ACC-003
+TXN-0059,2026-02-10,,fee,fx_conversion,37.69,,ACC-003
+TXN-0060,2026-01-24,,fee,fx_conversion,30.7,,ACC-001
+TXN-0061,2026-01-12,,fee,fx_conversion,42.38,,ACC-001
+TXN-0062,2026-02-14,,fee,atm,2.64,,ACC-003
+TXN-0063,2026-03-10,,fee,atm,4.8,,ACC-001
+TXN-0064,2026-01-12,,fee,atm,4.9,,ACC-001
+TXN-0065,2026-01-28,,fee,chargeback_fee,24.41,,ACC-001
+TXN-0066,2026-02-04,,fee,chargeback_fee,26.42,,ACC-001
+TXN-0067,2026-03-20,,fee,chargeback_fee,27.57,,ACC-001
+TXN-0068,2026-02-14,,fee,atm,13.76,,ACC-001
+TXN-0069,2026-01-21,,fee,fx_conversion,152.44,,ACC-003
+TXN-0070,2026-03-04,,fee,monthly_maintenance,65.59,,ACC-002
+TXN-0071,2026-03-18,,fee,international_wire_surcharge,57.5,,ACC-001
+TXN-0072,2026-02-01,,fee,check_printing_fee,34.4,,ACC-003
+TXN-0073,2026-01-11,Falcon Freight Co,payment,,1720.13,INV-47353,ACC-002
+TXN-0074,2026-01-11,Lakeside Analytics,payment,,1265.31,INV-81200,ACC-002
+TXN-0075,2026-01-18,,fee,overdraft,35.0,,ACC-002
+TXN-0076,2026-03-11,Nova Cloud Services,payment,,3656.35,INV-27601,ACC-002
+TXN-0077,2026-03-19,,fee,overdraft,35.0,,ACC-002
+TXN-0078,2026-02-14,,fee,overdraft,35.0,,ACC-001
+TXN-0079,2026-03-19,,fee,overdraft,35.0,,ACC-003

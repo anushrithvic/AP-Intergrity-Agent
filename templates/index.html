@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AP Integrity Agent</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="page">
+
+  <div class="stamp-header">
+    <div>
+      <h1>AP Integrity Agent</h1>
+      <div class="subtitle">Duplicate payment &amp; bank fee anomaly audit &mdash; {{ source_label }}</div>
+    </div>
+    <div class="batch-seal">
+      BATCH · {{ summary.batch_size }} TXNS<br>
+      {{ summary.n_payments }} PAYMENTS / {{ summary.n_fees }} FEES
+    </div>
+  </div>
+
+  <div class="live-actions">
+    <form action="{{ url_for('regenerate') }}" method="post">
+      <button type="submit" id="regenerate-btn">&#8635; Regenerate with a new seed &amp; rerun live</button>
+    </form>
+    <a href="{{ url_for('export_csv') }}" id="export-btn">&#8595; Export exception ledger (CSV)</a>
+  </div>
+
+  {% if brief_checks %}
+  <div class="brief-panel">
+    <div class="brief-panel-title">How this maps to the brief</div>
+    <ul class="brief-checklist">
+      {% for c in brief_checks %}
+      <li class="{{ 'pass' if c.passed else 'fail' }}">
+        <span class="mark">{{ '\u2713' if c.passed else '\u2013' }}</span>
+        <span class="brief-label">{{ c.label }}</span>
+        <span class="brief-detail mono">{{ c.detail }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-block">
+      {% for category, message in messages %}
+      <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="upload-block">
+    <h2 class="section-title">Load a batch</h2>
+    <p class="section-note">
+      Upload your own transactions CSV to run the same detectors on it. Columns required:
+      <span class="mono">transaction_id, date, vendor_name, transaction_type, fee_type, amount, invoice_number, account_id</span>.
+      An answer key is optional &mdash; without one, precision/recall/guard scoring is skipped and you'll just see the raw detector output.
+      <a href="{{ url_for('sample_template') }}">Download a template</a>.
+    </p>
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" class="upload-form">
+      <label class="file-label">
+        Transactions CSV (required)
+        <input type="file" name="transactions_file" accept=".csv" required>
+      </label>
+      <label class="file-label">
+        Answer key CSV (optional)
+        <input type="file" name="answer_key_file" accept=".csv">
+      </label>
+      <label class="file-label balances-label">
+        Account starting balances (optional, one per line: <span class="mono">ACC-001: 15000</span>) &mdash; needed to verify overdraft fees
+        <textarea name="starting_balances" rows="2" placeholder="ACC-001: 15000&#10;ACC-002: 2000"></textarea>
+      </label>
+      <button type="submit" id="upload-btn">Run on this batch</button>
+      {% if has_answer_key is defined and source_label and 'sample' not in source_label %}
+      <a href="{{ url_for('reset') }}" class="reset-link">Reset to sample batch</a>
+      {% endif %}
+    </form>
+  </div>
+
+  {% if score %}
+  <div class="metrics">
+    <div class="metric">
+      <div class="value mono">{{ '%.1f' % (score.precision * 100) }}%</div>
+      <div class="label">Precision</div>
+    </div>
+    <div class="metric">
+      <div class="value mono">{{ '%.1f' % (score.recall * 100) }}%</div>
+      <div class="label">Recall</div>
+    </div>
+    <div class="metric">
+      <div class="value mono">{{ score.n_flagged }}</div>
+      <div class="label">Exceptions flagged</div>
+    </div>
+    <div class="metric">
+      <div class="value mono">{{ '%.0f' % rate }}/s</div>
+      <div class="label">Throughput ({{ '%.0f' % elapsed_ms }}ms total)</div>
+    </div>
+  </div>
+  {% else %}
+  <div class="metrics metrics-noscore">
+    <div class="metric">
+      <div class="value mono">{{ summary.dup_total + summary.fee_total }}</div>
+      <div class="label">Exceptions flagged</div>
+    </div>
+    <div class="metric">
+      <div class="value mono">{{ '%.0f' % rate }}/s</div>
+      <div class="label">Throughput ({{ '%.0f' % elapsed_ms }}ms total)</div>
+    </div>
+    <div class="metric metric-wide">
+      <div class="label">No answer key uploaded &mdash; precision/recall not available for this batch.</div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if trap %}
+  <div class="guard-banner {{ '' if trap.passed else 'fail' }}">
+    <span class="seal-word">{{ 'PASS' if trap.passed else 'FAIL' }}</span>
+    <span>
+      False-positive guard: {{ trap.trap_ids|length }} seeded legitimate-repeat-business trap
+      transactions ({{ trap.trap_ids|join(', ') }}) &mdash;
+      {{ trap.wrongly_flagged|length }} incorrectly flagged.
+    </span>
+  </div>
+  {% endif %}
+
+  {% if false_negatives %}
+  <div class="missed-block">
+    Missed {{ false_negatives|length }} true exception(s), reported honestly, not hidden:
+    {% for fn in false_negatives %}<span class="id">{{ fn.id }}</span> ({{ fn.label }}){{ ", " if not loop.last }}{% endfor %}
+  </div>
+  {% endif %}
+
+  {% if unresolved %}
+  <div class="unresolved-block">
+    <strong>{{ unresolved|length }} item(s) could not be verified</strong> (not flagged, not cleared &mdash; an
+    honest "don't know" rather than a guess):
+    <ul>
+      {% for u in unresolved %}
+      <li><span class="id">{{ u.transaction_id }}</span> [{{ u.fee_type }}, ${{ '%.2f' % u.amount }}]: {{ u.reason }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% if analytics %}
+  <h2 class="section-title">Visual analytics</h2>
+  <div class="analytics-panel">
+    <div class="at-risk-callout">
+      <div class="at-risk-value mono">${{ '{:,.2f}'.format(analytics.total_at_risk) }}</div>
+      <div class="at-risk-label">at risk caught in this batch</div>
+      <div class="at-risk-breakdown">
+        ${{ '{:,.2f}'.format(analytics.dup_dollars) }} duplicate payments &middot;
+        ${{ '{:,.2f}'.format(analytics.fee_dollars) }} fee anomalies
+      </div>
+    </div>
+    <div class="analytics-charts">
+      <div class="chart-block">
+        <div class="chart-title">Duplicates vs. fee anomalies</div>
+        <canvas id="splitChart" height="180"></canvas>
+      </div>
+      <div class="chart-block">
+        <div class="chart-title">Vendor risk leaderboard</div>
+        {% if analytics.vendor_labels %}
+        <canvas id="vendorChart" height="180"></canvas>
+        {% else %}
+        <div class="chart-empty">No duplicate-payment vendors flagged in this batch.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="ledger-header-row">
+    <h2 class="section-title">Combined exception ledger</h2>
+    <a href="{{ url_for('export_csv') }}" class="ledger-export-link">Export CSV</a>
+  </div>
+  <p class="section-note">
+    {% if score %}
+    Every row below is a real detector output for this batch, scored against a hidden answer key &mdash; not a cherry-picked example.
+    {% else %}
+    Raw detector output for this batch. {{ rows|length }} exception(s) flagged out of {{ summary.batch_size }} transactions.
+    {% endif %}
+  </p>
+
+  <table class="ledger">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Confidence</th>
+        <th>Reason</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr class="{{ 'tag-duplicate' if r.tag == 'duplicate_payment' else 'tag-fee' }}">
+        <td class="id">{{ r.transaction_id }}</td>
+        <td class="tag {{ 'duplicate' if r.tag == 'duplicate_payment' else 'fee' }}">{{ r.display_tag }}</td>
+        <td class="confidence {{ r.confidence }}">{{ r.confidence }}</td>
+        <td class="reason">{{ r.reason }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="reason">No exceptions flagged in this batch.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="qa-console">
+    <h2 class="section-title">Ask the ledger</h2>
+    <p class="section-note">
+      Grounded Q&amp;A over the finished report above &mdash; every answer cites the transaction ID(s) it used, remembers what you just asked for follow-ups, and declines rather than guesses when a question falls outside this batch.
+      <span class="qa-mode {{ 'llm' if using_llm else 'offline' }}">
+        {{ 'Powered by Claude Haiku 4.5 (real tool-use)' if using_llm else 'Offline keyword router \u2014 set ANTHROPIC_API_KEY to use Claude instead' }}
+      </span>
+    </p>
+
+    <div class="qa-input-row">
+      <input type="text" id="question" placeholder="e.g. Why was TXN-0036 flagged?" autocomplete="off">
+      <button id="ask-btn">Ask</button>
+    </div>
+    <div class="suggested-qs">
+      Try:
+      <button type="button" class="try-q">What's the status of TXN-0038?</button>
+      <button type="button" class="try-q">why?</button>
+      <button type="button" class="try-q">List high confidence duplicates</button>
+      <button type="button" class="try-q">Duplicate payments over $3000</button>
+      <button type="button" class="try-q">Any flags for Acme Corp?</button>
+      <button type="button" class="try-q">Which vendor has the most flagged transactions?</button>
+      <button type="button" class="try-q">What's the status of TXN-9999?</button>
+      <button type="button" class="try-q">help</button>
+    </div>
+
+    <div class="qa-log" id="qa-log"></div>
+  </div>
+
+  <footer class="colophon">
+    Rule-based detection (fuzzy matching, median/MAD outlier scoring, running-balance proxy) &mdash;
+    no fine-tuned model. Scored against a hidden answer key generated alongside this batch.
+  </footer>
+
+</div>
+
+<script>
+const log = document.getElementById('qa-log');
+const input = document.getElementById('question');
+const btn = document.getElementById('ask-btn');
+
+async function ask(question) {
+  if (!question.trim()) return;
+  btn.disabled = true;
+  const entry = document.createElement('div');
+  entry.className = 'qa-entry';
+  entry.innerHTML = `<div class="q">${escapeHtml(question)}</div><div class="a">thinking…</div>`;
+  log.prepend(entry);
+
+  try {
+    const res = await fetch('/ask', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({question})
+    });
+    const data = await res.json();
+    entry.querySelector('.a').textContent = data.answer;
+  } catch (e) {
+    entry.querySelector('.a').textContent = 'Could not reach the agent (is app.py still running?).';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+btn.addEventListener('click', () => { ask(input.value); input.value = ''; });
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { ask(input.value); input.value = ''; }
+});
+document.querySelectorAll('.try-q').forEach(b => {
+  b.addEventListener('click', () => ask(b.textContent));
+});
+
+{% if analytics %}
+const analytics = {{ analytics|tojson }};
+const chartInk = getComputedStyle(document.body).getPropertyValue('--ink').trim() || '#1F2A24';
+const chartInkSoft = getComputedStyle(document.body).getPropertyValue('--ink-soft').trim() || '#4B5B50';
+const chartNavy = getComputedStyle(document.body).getPropertyValue('--accent-navy').trim() || '#24405B';
+const chartRed = getComputedStyle(document.body).getPropertyValue('--flag-red').trim() || '#9B2C2C';
+Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+Chart.defaults.color = chartInkSoft;
+
+const splitCanvas = document.getElementById('splitChart');
+if (splitCanvas) {
+  new Chart(splitCanvas, {
+    type: 'doughnut',
+    data: {
+      labels: analytics.split_labels,
+      datasets: [{
+        data: analytics.split_dollars,
+        backgroundColor: [chartNavy, chartRed],
+        borderColor: '#F4F8F1',
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.label}: $${ctx.parsed.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+          }
+        }
+      }
+    }
+  });
+}
+
+const vendorCanvas = document.getElementById('vendorChart');
+if (vendorCanvas && analytics.vendor_labels.length) {
+  new Chart(vendorCanvas, {
+    type: 'bar',
+    data: {
+      labels: analytics.vendor_labels,
+      datasets: [{
+        label: '$ flagged',
+        data: analytics.vendor_amounts,
+        backgroundColor: chartRed,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { callback: (v) => '$' + v.toLocaleString() }, grid: { color: '#C7D8C1' } },
+        y: { grid: { display: false }, ticks: { font: { size: 11 } } },
+      }
+    }
+  });
+}
+{% endif %}
+</script>
+
+</body>
+</html>

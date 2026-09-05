@@ -1,0 +1,80 @@
+transaction_id,true_label,notes
+TXN-0001,clean,
+TXN-0002,clean,
+TXN-0003,clean,
+TXN-0004,clean,
+TXN-0005,clean,
+TXN-0006,clean,
+TXN-0007,clean,
+TXN-0008,clean,
+TXN-0009,clean,
+TXN-0010,clean,
+TXN-0011,clean,
+TXN-0012,clean,
+TXN-0013,clean,
+TXN-0014,clean,
+TXN-0015,clean,
+TXN-0016,clean,
+TXN-0017,clean,
+TXN-0018,clean,
+TXN-0019,clean,
+TXN-0020,clean,
+TXN-0021,clean,
+TXN-0022,clean,
+TXN-0023,clean,
+TXN-0024,clean,
+TXN-0025,clean,
+TXN-0026,clean,
+TXN-0027,clean,
+TXN-0028,clean,
+TXN-0029,clean,
+TXN-0030,clean,
+TXN-0031,clean,
+TXN-0032,clean,
+TXN-0033,clean,
+TXN-0034,clean,
+TXN-0035,clean,
+TXN-0036,duplicate_payment,"Duplicate of the INV-37760 payment; same vendor/amount, invoice re-submitted under a new number"
+TXN-0037,clean,
+TXN-0038,duplicate_payment,Duplicate of the same INV-58944 payment; $4.43 rounding/fee difference
+TXN-0039,clean,
+TXN-0040,duplicate_payment,"Duplicate of the earlier INV-12757 payment, resubmitted 9 days later"
+TXN-0041,clean,
+TXN-0042,duplicate_payment,Duplicate of the Horizon Marketing Group INV-19305 payment; vendor name spelled/formatted differently
+TXN-0043,clean,
+TXN-0044,duplicate_payment,"Likely duplicate of the earlier Blue Ridge Facilities payment; different invoice number, amount within tolerance"
+TXN-0045,clean,
+TXN-0046,duplicate_payment,"Probable duplicate of the earlier Nova Cloud Services payment; fuzzy vendor match, amount within tolerance"
+TXN-0047,clean,
+TXN-0048,duplicate_payment,"Exact duplicate: same vendor, invoice, and amount as the prior day's payment"
+TXN-0049,clean,"Trap case: legitimate second invoice from same vendor same week, not a duplicate"
+TXN-0050,clean,"Trap case: legitimate second invoice from same vendor same week, not a duplicate"
+TXN-0051,clean,"Trap case: legitimate second invoice from same vendor same week, not a duplicate"
+TXN-0052,clean,"Trap case: legitimate second invoice from same vendor same week, not a duplicate"
+TXN-0053,clean,
+TXN-0054,clean,
+TXN-0055,clean,
+TXN-0056,clean,
+TXN-0057,clean,
+TXN-0058,clean,
+TXN-0059,clean,
+TXN-0060,clean,
+TXN-0061,clean,
+TXN-0062,clean,
+TXN-0063,clean,
+TXN-0064,clean,
+TXN-0065,clean,
+TXN-0066,clean,
+TXN-0067,clean,
+TXN-0068,fee_anomaly,atm fee ~3.7x the normal average for this fee type
+TXN-0069,fee_anomaly,fx_conversion fee ~3.8x the normal average for this fee type
+TXN-0070,fee_anomaly,monthly_maintenance fee ~4.7x the normal average for this fee type
+TXN-0071,fee_anomaly,Fee type never seen elsewhere in this batch - no baseline to validate against
+TXN-0072,fee_anomaly,Fee type never seen elsewhere in this batch - no baseline to validate against
+TXN-0073,clean,
+TXN-0074,clean,
+TXN-0075,clean,"Overdraft fee is logically valid: cumulative ACC-002 spend ($2985.44) exceeded its $2,000 starting balance by this date"
+TXN-0076,clean,
+TXN-0077,clean,"Overdraft fee is logically valid: cumulative ACC-002 spend ($3656.35) exceeded its $2,000 starting balance by this date"
+TXN-0078,fee_anomaly,Overdraft fee has no logical basis: ACC-001's balance never went negative around this date
+TXN-0079,fee_anomaly,Overdraft fee has no logical basis: ACC-003's balance never went negative around this date
